@@ -26,7 +26,7 @@ class TextFormatter:
             return "URL"
         
         #``````で囲まれた部分はコードと読む
-        text = re.sub(r'``````(.+?)``````', 'コード', text)
+        text = re.sub(r'```(.+?)```', 'コード', text)
         
         """
         堀江晶太はほりえしょうたに変換
