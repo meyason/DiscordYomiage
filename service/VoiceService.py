@@ -2,13 +2,41 @@ from exception.TalkBotException import *
 from manager.BotManager import BotManager
 from model.SpeakManager import SpeakManager
 from dictionary.UserDictionary import UserDictionary
-from discord.player import FFmpegPCMAudio
+import asyncio
+from discord.player import FFmpegPCMAudio, PCMVolumeTransformer
 
 botmanager = BotManager.get_instance()
 
 def leaveCheck(interaction):
     if not(interaction.guild.voice_client and interaction.guild.voice_client.is_connected()):
         raise NotJoinedException()
+    
+async def play(interaction, file_name):
+    if interaction.user.voice is None:
+        raise UserNotJoinedException()
+    if not(interaction.guild.voice_client and interaction.guild.voice_client.is_connected()):
+        raise NotJoinedException()
+    
+    botmanager.set_singen(interaction.guild.id, True)
+    audio_path = f"audio\\{file_name}"
+    print(audio_path)
+    # 読み込み
+    audio = FFmpegPCMAudio(audio_path)
+    source = PCMVolumeTransformer(audio, volume=0.2)
+    # 再生
+    interaction.guild.voice_client.play(source)
+    
+async def stop(interaction):
+    if not(interaction.guild.voice_client and interaction.guild.voice_client.is_connected()):
+        raise NotJoinedException()
+    if interaction.user.voice is None:
+        raise UserNotJoinedException()
+    if not botmanager.get_singen(interaction.guild.id):
+        raise NotSingException()
+    
+    botmanager.set_singen(interaction.guild.id, False)
+    interaction.guild.voice_client.stop()
+
     
 async def join(interaction):
     if interaction.user.voice is None:

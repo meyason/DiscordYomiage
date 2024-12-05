@@ -15,13 +15,19 @@ class BotManager:
         self.__textformatter = textformatter
     
     def initialize(self, guild_id, speakmanager, userdictionary):
-        self.__container[guild_id] = {"speakmanager": speakmanager, "userdictionary": userdictionary, "shinku": self.__shinku, "textformatter": self.__textformatter}
+        self.__container[guild_id] = {"speakmanager": speakmanager, "userdictionary": userdictionary, "shinku": self.__shinku, "textformatter": self.__textformatter, "singen": False}
 
     def get_speakmanager(self, guild_id):
         return self.__container[guild_id]["speakmanager"]
     
     def get_userdictionary(self, guild_id):
         return self.__container[guild_id]["userdictionary"]
+    
+    def set_singen(self, guild_id, singen):
+        self.__container[guild_id]["singen"] = singen
+
+    def get_singen(self, guild_id):
+        return self.__container[guild_id]["singen"]
     
     def get_shinku(self, guild_id):
         return self.__container[guild_id]["shinku"]

@@ -17,7 +17,7 @@ class TextFormatter:
                     dict[line_list[0]] = line_list[1]
         self.dict = dict
 
-    def format_text(self, text, dictionary):
+    def format_text(self, text, dictionary, limit=500):
         # URLの正規表現パターン
         url_pattern = re.compile(r'https?://\S+|www\.\S+')
         
@@ -25,8 +25,13 @@ class TextFormatter:
         if url_pattern.match(text):
             return "URL"
         
-        #``````で囲まれた部分はコードと読む
-        text = re.sub(r'```(.+?)```', 'コード', text)
+        # 絵文字("\N{...}"か"<:...:数字列>")を削除
+        text = re.sub(r'<a?:\w+:\d+>', '', text)
+        text = re.sub(r'[\U00010000-\U0010ffff]', '', text)
+
+        
+        #```で囲まれた部分はコードと読む
+        text = re.sub(r'```.*?```', 'コード', text, flags=re.DOTALL)
         
         """
         堀江晶太はほりえしょうたに変換
@@ -35,6 +40,8 @@ class TextFormatter:
         """
         text = text.replace('堀江', 'ほりえ')
         text = text.replace('晶太', 'しょうた')
+        text = text.replace('佐咲', 'ささき')
+        text = text.replace('紗花', 'さやか')
 
         # ユーザー辞書を取得し、単語を置換
         for word, definition in dictionary.items():
@@ -57,8 +64,8 @@ class TextFormatter:
 
         
         # 文字数が1000字を超える場合省略
-        if len(text) > 500:
-            return text[:500] + "以下略"
+        if len(text) > limit:
+            return text[:limit] + "以下略"
         
         return text
 

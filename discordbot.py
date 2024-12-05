@@ -42,9 +42,11 @@ async def on_message(message):
     userdictionary = botmanager.get_userdictionary(guild.id)
     if not speakmanager.is_setted_textChannel(message.channel):
         return
-    
-    if guild.voice_client.is_playing():
-        guild.voice_client.stop()
+    isSingen = botmanager.get_singen(guild.id)
+    if isSingen:
+        if(guild.voice_client.is_playing()):
+            return
+        botmanager.set_singen(guild.id, False)
 
     try:
         # 添付ファイルの場合を考慮
@@ -52,11 +54,27 @@ async def on_message(message):
             text = "添付ファイルだ。"
         else:
             # メンションはdisplayNameに変換
+            print(message.content)
             text = message.content
+            flag = False
             for mention in message.mentions:
+                # メンションがこのbotの場合は削除
+                if mention.id == bot.user.id:
+                    flag = True
+                    text = text.replace(f"<@{mention.id}>", "")
+                    continue
                 text = text.replace(f"<@{mention.id}>", "アットマーク" + mention.display_name)
 
-            text = textformatter.format_text(text, userdictionary.dictionary)
+            limit = 500
+            if flag:
+                # botをメンションした場合は文字数制限を緩和
+                limit = 5000
+            text = textformatter.format_text(text, userdictionary.dictionary, limit)
+            if text == "":
+                return
+            
+        if guild.voice_client.is_playing():
+            guild.voice_client.stop()
 
         audio = await asyncio.wait_for(shinku.talk(text), timeout=60)
 
@@ -90,6 +108,11 @@ async def on_voice_state_update(member, before, after):
             # 参加してるチャンネルと違う場合は無視
             if member.guild.voice_client.channel != after.channel:
                 return
+            isSingen = botmanager.get_singen(member.guild.id)
+            if isSingen:
+                if(member.guild.voice_client.is_playing()):
+                    return
+                botmanager.set_singen(member.guild.id, False)
             text = f"やあ、{member.display_name}。"
             userdictionary = botmanager.get_userdictionary(member.guild.id)
             text = textformatter.format_text(text, userdictionary.dictionary)

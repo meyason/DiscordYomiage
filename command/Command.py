@@ -4,6 +4,8 @@ INITIAL_EXTENSIONS = [
     'command.addDictionaryCommand',
     'command.deleteDictionaryCommand',
     'command.listDictionaryCommand',
+    'command.singCommand',
+    'command.stopSingCommand',
 ]
 
 async def load_extension(bot):

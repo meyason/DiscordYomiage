@@ -56,3 +56,9 @@ class NotExistDictionaryException(MusicBotException):
             "私、何も知らないみたいだ。"
         )
     
+class NotSingException(MusicBotException):
+    def __str__(self) -> str:
+        return (
+            "歌ってないぞ...？"
+        )
+    

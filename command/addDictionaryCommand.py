@@ -21,8 +21,8 @@ class addDictionaryCommand(commands.Cog):
             if "äüöß" in word:
                 word = word.replace("äüöß", "")
             
-            # 300字以上はカットオフ
-            word = word[:300]
+            # 100字以上はカットオフ
+            word = word[:100]
 
             if not VoiceService.is_exist_container(interaction):
                 UserDictionary.add_dictionary(interaction.guild.id, word, yomikata)
